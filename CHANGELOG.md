@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.7] - 2026-11-18
+
+### Changed
+- Picks up game-common 1.17.0 (a board redraw fix used by chess, binairo and
+  tatami; no change in this game).
+
 ## [1.0.6] - 2026-11-12
 
 ### Changed
