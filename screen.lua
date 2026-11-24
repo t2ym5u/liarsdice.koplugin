@@ -229,12 +229,12 @@ end
 
 function LiarsDiceScreen:_scheduleBot()
     if self._bot_step or self.closed then return end
-    self._bot_step = function()
+    local step = function()
         self._bot_step = nil
         if self.closed then return end
         self:_botMove()
     end
-    UIManager:scheduleIn(BOT_DELAY, self._bot_step)
+    self._bot_step = self:schedule(BOT_DELAY, step)
 end
 
 function LiarsDiceScreen:_botMove()
@@ -257,7 +257,7 @@ function LiarsDiceScreen:_botMove()
 end
 
 function LiarsDiceScreen:onNewGame()
-    if self._bot_step then UIManager:unschedule(self._bot_step) end
+    self:cancelScheduled()  -- a pending computer bid belongs to the old game
     self._bot_step = nil
     self:_newBoard()
     self:_save()
@@ -564,7 +564,17 @@ function LiarsDiceScreen:_playerRows(w, px, show, mark)
     local b = self.board
     local last = {}
     for _i, h in ipairs(b.history or {}) do last[h.p] = h end
-    local name_w = math.floor(w * 0.40)
+    -- Wide enough for the longest name as the current player shows it (bold,
+    -- with "▸ "), up to 55%: at a fixed 40% the narrow landscape panel cut
+    -- "Computer 2" to "Compute…". The dice shrink to what is left.
+    local need = 0
+    for _i, p in ipairs(b.players) do
+        local t = TextWidget:new{ text = "▸ " .. p.name, face = pxFace(px, true), bold = true }
+        need = math.max(need, t:getSize().w)
+        t:free()
+    end
+    local name_w = math.min(math.max(math.floor(w * 0.40), need + 2 * Size.padding.large + 1),
+                            math.floor(w * 0.55))
     local bid_w  = show and 0 or math.floor(w * 0.22)
     local dice_w = w - name_w - bid_w
     local die = math.min(math.floor(px * (show and 1.7 or 1.3)), DiceRow.sizeFor(Board.START_DICE, dice_w - Size.padding.default))

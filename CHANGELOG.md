@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.10] - 2026-11-24
+
+### Fixed
+- In landscape a long player name ("Computer 2") was cut off: the name
+  column now fits the longest name.
+- Picks up game-common 1.20.0: a deferred action (timer tick, computer's
+  move, card flip) no longer runs once the game is closed or a new game has
+  started, and the game is saved a few seconds after a move instead of after
+  every one, and at once on close, suspend or power-off.
+
 ## [1.0.9] - 2026-11-24
 
 ### Changed
